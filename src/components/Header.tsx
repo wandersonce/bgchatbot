@@ -15,7 +15,7 @@ function Header() {
         </div>
       </Link>
 
-      <div>
+      <div className="flex items-center">
         <SignedIn>
           <UserButton showName />
         </SignedIn>
