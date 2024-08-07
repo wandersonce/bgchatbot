@@ -1,0 +1,4 @@
+configurationset:
+  - configuration:
+      name: postgresql_config
+      uri: postgresql://ep-empty-art-a5xvv9ks.us-east-2.aws.neon.tech/bamchatbot?user=bamchatbot_owner&password=I2REm6zUNfGJ
