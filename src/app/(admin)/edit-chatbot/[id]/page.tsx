@@ -34,7 +34,6 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
   >(GET_CHATBOT_BY_ID, { variables: { id } });
 
   useEffect(() => {
-    console.log('here');
     if (data) {
       setChatbotName(data.chatbots.name);
     }
