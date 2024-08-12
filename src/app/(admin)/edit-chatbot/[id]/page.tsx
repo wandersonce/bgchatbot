@@ -9,10 +9,28 @@ import { Copy } from 'lucide-react';
 import { typeFromAST } from 'graphql';
 import { toast } from 'sonner';
 import Avatar from '@/components/Avatar';
+import { useQuery } from '@apollo/client';
+import { GET_CHATBOT_BY_ID } from '../../../../../graphql/queries/queries';
+import {
+  GetChatbotByIdResponse,
+  GetChatbotByIdVariables,
+} from '../../../../../types/types';
 
 function EditChatbot({ params: { id } }: { params: { id: string } }) {
   const [url, setUrl] = useState<string>('');
   const [chatbotName, setChatbotName] = useState<string>('');
+
+  const { data, loading, error } = useQuery<
+    GetChatbotByIdResponse,
+    GetChatbotByIdVariables
+  >(GET_CHATBOT_BY_ID, { variables: { id } });
+
+  useEffect(() => {
+    console.log('here');
+    if (data) {
+      setChatbotName(data.chatbots.name);
+    }
+  }, [data]);
 
   useEffect(() => {
     const url = `${BASE_URL}/chatbot/${id}`;
@@ -56,6 +74,18 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
         </Button>
         <div>
           <Avatar seed={chatbotName} />
+          <form>
+            <Input
+              value={chatbotName}
+              onChange={(e) => setChatbotName(e.target.value)}
+              placeholder={chatbotName}
+              className="w-full border-none bg-transparent text-xl font-bold"
+              required
+            />
+            <Button disabled={!chatbotName} type="submit">
+              Update
+            </Button>
+          </form>
         </div>
       </section>
     </div>
