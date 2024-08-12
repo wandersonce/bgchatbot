@@ -6,19 +6,27 @@ import { useEffect, useState } from 'react';
 import { BASE_URL } from '../../../../../graphql/apolloClient';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
-import { typeFromAST } from 'graphql';
+
 import { toast } from 'sonner';
 import Avatar from '@/components/Avatar';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { GET_CHATBOT_BY_ID } from '../../../../../graphql/queries/queries';
 import {
   GetChatbotByIdResponse,
   GetChatbotByIdVariables,
 } from '../../../../../types/types';
+import Characteristic from '@/components/Characteristic';
+import { DELETE_CHATBOT } from '../../../../../graphql/mutations/mutations';
 
 function EditChatbot({ params: { id } }: { params: { id: string } }) {
   const [url, setUrl] = useState<string>('');
+  const [newCharacteristic, setNewCharacteristic] = useState<string>('');
   const [chatbotName, setChatbotName] = useState<string>('');
+
+  const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
+    refetchQueries: [{ query: GET_CHATBOT_BY_ID }],
+    awaitRefetchQueries: true,
+  });
 
   const { data, loading, error } = useQuery<
     GetChatbotByIdResponse,
@@ -72,9 +80,12 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
         >
           X
         </Button>
-        <div>
+        <div className="flex space-x-4">
           <Avatar seed={chatbotName} />
-          <form>
+          <form
+            // onSubmit={handleUpdateChatbot}
+            className="flex flex-1 space-x-2 items-center"
+          >
             <Input
               value={chatbotName}
               onChange={(e) => setChatbotName(e.target.value)}
@@ -86,6 +97,32 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
               Update
             </Button>
           </form>
+        </div>
+        <h2 className="text-xl font-bold mt-10">Heres what your AI knows...</h2>
+        <p>
+          Your chatbot is equipped with the following information to assist you
+          in your conversations with your audience
+        </p>
+        <div>
+          <form className="flex">
+            <Input
+              type="text"
+              placeholder="Example: If user asks for product, provide url of the item."
+              value={newCharacteristic}
+              onChange={(e) => setNewCharacteristic(e.target.value)}
+            />
+            <Button type="submit" disabled={!newCharacteristic}>
+              Add
+            </Button>
+          </form>
+          <ul className="flex flex-wrap-reverse gap-5">
+            {data?.chatbots.chatbot_characteristics.map((characteristic) => (
+              <Characteristic
+                key={characteristic.id}
+                characteristic={characteristic}
+              />
+            ))}
+          </ul>
         </div>
       </section>
     </div>
