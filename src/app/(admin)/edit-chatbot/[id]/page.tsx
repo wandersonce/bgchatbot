@@ -16,7 +16,10 @@ import {
   GetChatbotByIdVariables,
 } from '../../../../../types/types';
 import Characteristic from '@/components/Characteristic';
-import { DELETE_CHATBOT } from '../../../../../graphql/mutations/mutations';
+import {
+  ADD_CHARACTERISTIC,
+  DELETE_CHATBOT,
+} from '../../../../../graphql/mutations/mutations';
 import { redirect } from 'next/navigation';
 
 function EditChatbot({ params: { id } }: { params: { id: string } }) {
@@ -27,6 +30,10 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
   const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
     refetchQueries: ['GetChatbotById'],
     awaitRefetchQueries: true,
+  });
+
+  const [addCharacteristic] = useMutation(ADD_CHARACTERISTIC, {
+    refetchQueries: ['GetChatbotById'],
   });
 
   const { data, loading, error } = useQuery<
@@ -63,6 +70,26 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
     } catch (error) {
       console.log('Error deleting chatbot: ', error);
       toast.error('Failed to delete chatbot');
+    }
+  };
+
+  const handleAddCharacteristic = async (content: string) => {
+    try {
+      const promise = addCharacteristic({
+        variables: {
+          chatbotId: Number(id),
+          content,
+          created_at: new Date(),
+        },
+      });
+
+      toast.promise(promise, {
+        loading: 'Adding...',
+        success: 'Information Added',
+        error: 'Error adding information',
+      });
+    } catch (error) {
+      console.log('Failed to add Characteristic: ', error);
     }
   };
 
@@ -135,7 +162,14 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
           in your conversations with your audience
         </p>
         <div>
-          <form className="flex">
+          <form
+            className="flex"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAddCharacteristic(newCharacteristic);
+              setNewCharacteristic('');
+            }}
+          >
             <Input
               type="text"
               placeholder="Example: If user asks for product, provide url of the item."
