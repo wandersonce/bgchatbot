@@ -4,7 +4,6 @@ import { OctagonX } from 'lucide-react';
 import { ChatbotCharacteristic } from '../../types/types';
 import { useMutation } from '@apollo/client';
 import { REMOVE_CHARACTERISTIC } from '../../graphql/mutations/mutations';
-import { GET_CHATBOT_BY_ID } from '../../graphql/queries/queries';
 import { toast } from 'sonner';
 
 function Characteristic({
@@ -13,7 +12,7 @@ function Characteristic({
   characteristic: ChatbotCharacteristic;
 }) {
   const [removeCharacteristic] = useMutation(REMOVE_CHARACTERISTIC, {
-    refetchQueries: [{ query: GET_CHATBOT_BY_ID }],
+    refetchQueries: ['GetChatbotById'],
   });
 
   const handleRemoveCharacteristic = async (characteristicId: number) => {

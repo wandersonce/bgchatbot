@@ -28,7 +28,7 @@ export const REMOVE_CHARACTERISTIC = gql`
 
 export const DELETE_CHATBOT = gql`
   mutation DeleteChatbot($id: Int!) {
-    deleteChatbot(id: $id) {
+    deleteChatbots(id: $id) {
       id
     }
   }

@@ -17,6 +17,7 @@ import {
 } from '../../../../../types/types';
 import Characteristic from '@/components/Characteristic';
 import { DELETE_CHATBOT } from '../../../../../graphql/mutations/mutations';
+import { redirect } from 'next/navigation';
 
 function EditChatbot({ params: { id } }: { params: { id: string } }) {
   const [url, setUrl] = useState<string>('');
@@ -24,7 +25,7 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
   const [chatbotName, setChatbotName] = useState<string>('');
 
   const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
-    refetchQueries: [{ query: GET_CHATBOT_BY_ID }],
+    refetchQueries: ['GetChatbotById'],
     awaitRefetchQueries: true,
   });
 
@@ -44,6 +45,37 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
 
     setUrl(url);
   }, [id]);
+
+  const handleDelete = async (id: string) => {
+    const isConfirmed = window.confirm(
+      'Are you sure you want to delete this chatbot?'
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      const promise = deleteChatbot({ variables: { id } });
+      toast.promise(promise, {
+        loading: 'Deleting...',
+        success: 'Chatbot deleted successfully',
+        error: 'Error deleting chatbot',
+      });
+    } catch (error) {
+      console.log('Error deleting chatbot: ', error);
+      toast.error('Failed to delete chatbot');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="mx-auto animate-spin p-10">
+        <Avatar seed='"BAM CHATBOT Support Agent' />
+      </div>
+    );
+  }
+
+  if (error) return <p>Error: {error.message}</p>;
+  if (!data?.chatbots) return redirect('/view-chatbots');
 
   return (
     <div className="px-0 md:p-10">
@@ -75,7 +107,7 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
         <Button
           variant="destructive"
           className="absolute top-0 right-2 h-8 w-2"
-          // onClick={() => handleDelete(id)}
+          onClick={() => handleDelete(id)}
         >
           X
         </Button>
@@ -115,7 +147,7 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
             </Button>
           </form>
           <ul className="flex flex-wrap-reverse gap-5">
-            {data?.chatbots.chatbot_characteristics.map((characteristic) => (
+            {data?.chatbots?.chatbot_characteristics.map((characteristic) => (
               <Characteristic
                 key={characteristic.id}
                 characteristic={characteristic}
