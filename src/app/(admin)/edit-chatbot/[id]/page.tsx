@@ -19,6 +19,7 @@ import Characteristic from '@/components/Characteristic';
 import {
   ADD_CHARACTERISTIC,
   DELETE_CHATBOT,
+  UPDATE_CHATBOT,
 } from '../../../../../graphql/mutations/mutations';
 import { redirect } from 'next/navigation';
 
@@ -33,6 +34,10 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
   });
 
   const [addCharacteristic] = useMutation(ADD_CHARACTERISTIC, {
+    refetchQueries: ['GetChatbotById'],
+  });
+
+  const [updateChatbot] = useMutation(UPDATE_CHATBOT, {
     refetchQueries: ['GetChatbotById'],
   });
 
@@ -93,6 +98,27 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
     }
   };
 
+  const handleUpdateChatbot = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const promise = updateChatbot({
+        variables: {
+          id,
+          name: chatbotName,
+        },
+      });
+
+      toast.promise(promise, {
+        loading: 'Updating...',
+        success: 'Chatbot Name Successfully updated!',
+        error: 'Failed to update chatbot name',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="mx-auto animate-spin p-10">
@@ -141,7 +167,7 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
         <div className="flex space-x-4">
           <Avatar seed={chatbotName} />
           <form
-            // onSubmit={handleUpdateChatbot}
+            onSubmit={handleUpdateChatbot}
             className="flex flex-1 space-x-2 items-center"
           >
             <Input
@@ -161,9 +187,9 @@ function EditChatbot({ params: { id } }: { params: { id: string } }) {
           Your chatbot is equipped with the following information to assist you
           in your conversations with your audience
         </p>
-        <div>
+        <div className="bg-gray-200 p-5 md:p-5 rounded-md mt-5">
           <form
-            className="flex"
+            className="flex space-x-2 mb-5"
             onSubmit={(e) => {
               e.preventDefault();
               handleAddCharacteristic(newCharacteristic);
