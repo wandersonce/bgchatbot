@@ -30,6 +30,7 @@ export const GET_CHATBOTS_BY_USER = gql`
     chatbotsByUser(clerk_user_id: $clerk_user_id) {
       id
       name
+      created_at
       chatbot_characteristics {
         content
         id
