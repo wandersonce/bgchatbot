@@ -1,6 +1,6 @@
 import { serverClient } from '@/lib/server/serverClient';
 import { auth } from '@clerk/nextjs/server';
-import { GET_CHATBOT_BY_USER } from '../../../../graphql/queries/queries';
+import { GET_CHATBOTS_BY_USER } from '../../../../graphql/queries/queries';
 import {
   Chatbot,
   GetChatbotsByUserData,
@@ -20,7 +20,7 @@ async function ViewChatbots() {
     GetChatbotsByUserData,
     GetChatbotsByUserDataVariables
   >({
-    query: GET_CHATBOT_BY_USER,
+    query: GET_CHATBOTS_BY_USER,
     variables: {
       clerk_user_id: userId,
     },
@@ -33,7 +33,7 @@ async function ViewChatbots() {
   );
 
   return (
-    <div>
+    <div className="flex-1 pb-20 p-10">
       <h1 className="text-xl lg:text-3xl font-semibold mb-5">
         Active Chatbots
       </h1>
