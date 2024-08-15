@@ -26,7 +26,7 @@ function ChatbotSessions({ chatbots }: { chatbots: Chatbot[] }) {
   }, [chatbots]);
 
   return (
-    <div>
+    <div className="bg-white">
       <Accordion type="single" collapsible>
         {sortedChatbots.map((chatbot) => {
           const hasSessions = chatbot.chat_sessions.length > 0;
