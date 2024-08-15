@@ -11,7 +11,7 @@ function LoginPage() {
           </div>
 
           <div className="text-center">
-            <h1 className="text-4xl">Assistly</h1>
+            <h1 className="text-4xl">Bam Assistant</h1>
             <h2 className="Your Customisable AI Chat Agent"></h2>
             <h3 className="my-5 font-bold">Sign in to get started</h3>
           </div>
