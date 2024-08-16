@@ -150,6 +150,17 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           content: message,
         }),
       });
+
+      const result = await response.json();
+
+      //Update the loading message for teh AI with the actual response from the API
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === loadingMessage.id
+            ? { ...msg, content: result.content, id: result.id }
+            : msg
+        )
+      );
     } catch (error) {
       console.log('Error Sending Message: ', error);
     }
