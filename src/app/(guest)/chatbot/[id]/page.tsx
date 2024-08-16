@@ -9,15 +9,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useState } from 'react';
-import { GetChatbotByIdResponse, Message } from '../../../../../types/types';
+import { useEffect, useState } from 'react';
+import {
+  GetChatbotByIdResponse,
+  Message,
+  MessagesByChatSessionIdResponse,
+  MessagesByChatSessionIdVariables,
+} from '../../../../../types/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import startNewChat from '@/lib/startNewChat';
 import Avatar from '@/components/Avatar';
 import { useQuery } from '@apollo/client';
-import { GET_CHATBOT_BY_ID } from '../../../../../graphql/queries/queries';
+import {
+  GET_CHATBOT_BY_ID,
+  GET_MESSAGES_BY_CHAT_SESSION_ID,
+} from '../../../../../graphql/queries/queries';
+import Messages from '@/components/Messages';
 
 function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [name, setName] = useState('');
@@ -33,6 +42,24 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       variables: { id },
     }
   );
+
+  const {
+    loading: loadingQuery,
+    error,
+    data,
+  } = useQuery<
+    MessagesByChatSessionIdResponse,
+    MessagesByChatSessionIdVariables
+  >(GET_MESSAGES_BY_CHAT_SESSION_ID, {
+    variables: { chat_session_id: chatId },
+    skip: !chatId,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setMessages(data.chat_sessions.messages);
+    }
+  }, [data]);
 
   const handleInformationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,6 +135,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             </p>
           </div>
         </div>
+        <Messages
+          messages={messages}
+          chatbotName={chatBotData?.chatbots.name!}
+        />
       </div>
     </div>
   );
