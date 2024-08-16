@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const formattedPreviousMessages: ChatCompletionMessageParam[] =
       previousMessages.map((message) => ({
         role: message.sender === 'ai' ? 'system' : 'user',
-        name: message.sender === 'ai' ? ' system' : name,
+        name: message.sender === 'ai' ? 'system' : 'user',
         content: message.content,
       }));
 
@@ -81,7 +81,9 @@ export async function POST(req: NextRequest) {
       model: 'gpt-3.5-turbo',
     });
 
-    const aiResponse = opneaiResponse?.choices?.[0]?.message?.content?.trim();
+    console.log(opneaiResponse);
+    const aiResponse = opneaiResponse?.choices[0]?.message?.content?.trim();
+    console.log(aiResponse);
 
     if (!aiResponse) {
       return NextResponse.json(

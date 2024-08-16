@@ -115,7 +115,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
     // Optimistically update the UI with the user's message
     const userMessage: Message = {
-      id: Date.now(),
+      id: Date.now() + 1,
       content: message,
       created_at: new Date().toISOString(),
       chat_session_id: chatId,
@@ -152,6 +152,8 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       });
 
       const result = await response.json();
+
+      console.log(result);
 
       //Update the loading message for teh AI with the actual response from the API
       setMessages((prevMessages) =>
