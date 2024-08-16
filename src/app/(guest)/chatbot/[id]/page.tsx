@@ -27,6 +27,21 @@ import {
   GET_MESSAGES_BY_CHAT_SESSION_ID,
 } from '../../../../../graphql/queries/queries';
 import Messages from '@/components/Messages';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+const formSchema = z.object({
+  message: z.string().min(2, 'Your Message is too short!'),
+});
 
 function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [name, setName] = useState('');
@@ -35,6 +50,13 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      message: '',
+    },
+  });
 
   const { data: chatBotData } = useQuery<GetChatbotByIdResponse>(
     GET_CHATBOT_BY_ID,
@@ -139,6 +161,28 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           messages={messages}
           chatbotName={chatBotData?.chatbots.name!}
         />
+
+        <Form {...form}>
+          <form>
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel hidden>Message</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Type your question..."
+                      {...field}
+                      className="p-8"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
       </div>
     </div>
   );

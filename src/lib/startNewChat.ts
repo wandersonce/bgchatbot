@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client';
 import client from '../../graphql/apolloClient';
 import {
   INSERT_CHAT_SESSION,
