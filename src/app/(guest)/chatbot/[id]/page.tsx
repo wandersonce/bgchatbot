@@ -130,6 +130,29 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       chat_session_id: chatId,
       sender: 'ai',
     };
+
+    setMessages((previousMessage) => [
+      ...previousMessage,
+      userMessage,
+      loadingMessage,
+    ]);
+
+    try {
+      const response = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name,
+          chat_session_id: chatId,
+          chatbot_id: id,
+          content: message,
+        }),
+      });
+    } catch (error) {
+      console.log('Error Sending Message: ', error);
+    }
   }
 
   return (
