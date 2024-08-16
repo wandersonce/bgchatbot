@@ -95,6 +95,43 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     setIsOpen(false);
   };
 
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    const { message: formMessage } = values;
+
+    const message = formMessage;
+    form.reset();
+
+    if (!name || !email) {
+      setIsOpen(true);
+      setIsLoading(true);
+      return;
+    }
+
+    //Handle the Message Submission
+    if (!message.trim()) {
+      return; //do not submit if the message is empty
+    }
+
+    // Optimistically update the UI with the user's message
+    const userMessage: Message = {
+      id: Date.now(),
+      content: message,
+      created_at: new Date().toISOString(),
+      chat_session_id: chatId,
+      sender: 'user',
+    };
+
+    //Show loading state for AI response
+    const loadingMessage: Message = {
+      id: Date.now(),
+      content: 'Asking bam...',
+      created_at: new Date().toISOString(),
+      chat_session_id: chatId,
+      sender: 'ai',
+    };
+  }
+
   return (
     <div className="w-full flex bg-gray-100">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -163,7 +200,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
         />
 
         <Form {...form}>
-          <form className="flex items-start sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex items-start sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
+          >
             <FormField
               control={form.control}
               name="message"
@@ -181,7 +221,11 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="h-full">
+            <Button
+              disabled={form.formState.isSubmitting || !form.formState.isValid}
+              type="submit"
+              className="h-full"
+            >
               Send
             </Button>
           </form>
