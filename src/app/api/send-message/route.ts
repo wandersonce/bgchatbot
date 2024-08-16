@@ -10,6 +10,8 @@ import {
   GET_MESSAGES_BY_CHAT_SESSION_ID,
 } from '../../../../graphql/queries/queries';
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
+import { error } from 'console';
+import { INSERT_MESSAGE } from '../../../../graphql/mutations/mutations';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -76,7 +78,44 @@ export async function POST(req: NextRequest) {
     //Send the message to OpenAI's Completions API
     const opneaiResponse = await openai.chat.completions.create({
       messages: messages,
-      model: 'gpt-4o',
+      model: 'gpt-3.5-turbo',
+    });
+
+    const aiResponse = opneaiResponse?.choices?.[0]?.message?.content?.trim();
+
+    if (!aiResponse) {
+      return NextResponse.json(
+        { error: 'Failed to generate AI response' },
+        { status: 500 }
+      );
+    }
+
+    //Save user's message into the database
+    await serverClient.mutate({
+      mutation: INSERT_MESSAGE,
+      variables: {
+        chat_session_id,
+        content,
+        sender: 'user',
+        created_at: new Date(),
+      },
+    });
+
+    //Save AI's message into the database
+    const aiMessageResult = await serverClient.mutate({
+      mutation: INSERT_MESSAGE,
+      variables: {
+        chat_session_id,
+        content: aiResponse,
+        sender: 'ai',
+        created_at: new Date(),
+      },
+    });
+
+    //Return the AI's response to the client
+    return NextResponse.json({
+      id: aiMessageResult.data.insertMessages.id,
+      content: aiResponse,
     });
   } catch (error) {
     console.log('Error sending message', error);
